@@ -1,49 +1,155 @@
 {
-  "productions": [
-    {
-      "name": "P1_Rozwin_X",
-      "priority": 1,
-      "danglingEdges": "delete",
-      "left": {
-        "vertices": [
-          { "index": 0, "label": "A" },
-          { "index": 1, "label": "X" }
-        ],
-        "edges": [
-          { "u": 0, "v": 1 }
+  "grammar": {
+    "name": "Gramatyka siatek trójkątnych",
+    "directed": false,
+    "danglingEdges": "forbid",
+
+    "labels": {
+      "nonterminals": ["X", "Y", "Z"],
+      "terminals": ["a", "b", "c"]
+    },
+
+    "startGraph": {
+      "vertices": [
+        { "index": 0, "label": "X" },
+        { "index": 1, "label": "Y" },
+        { "index": 2, "label": "Z" }
+      ],
+      "edges": [
+        { "u": 0, "v": 1 },
+        { "u": 1, "v": 2 },
+        { "u": 0, "v": 2 }
+      ]
+    },
+
+    "productions": [
+      {
+        "name": "P1",
+        "description": "X -> trójkąt X-Y-Z (doklejenie nowego trójkąta w węźle X)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "X" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [
+            { "index": 0, "label": "X" },
+            { "index": 1, "label": "Y" },
+            { "index": 2, "label": "Z" }
+          ],
+          "edges": [
+            { "u": 0, "v": 1 },
+            { "u": 1, "v": 2 },
+            { "u": 0, "v": 2 }
+          ]
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": []
+      },
+      {
+        "name": "P2",
+        "description": "Y -> b - X (nowy węzeł X tworzy trójkąty z sąsiadami Z)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "Y" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [
+            { "index": 0, "label": "b" },
+            { "index": 1, "label": "X" }
+          ],
+          "edges": [ { "u": 0, "v": 1 } ]
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": [
+          { "leftVertex": 0, "neighborLabel": "Z", "connectTo": [1] }
         ]
       },
-      "right": {
-        "vertices": [
-          { "index": 0, "label": "A" },
-          { "index": 1, "label": "Y" },
-          { "index": 2, "label": "Z" }
-        ],
-        "edges": [
-          { "u": 0, "v": 1 },
-          { "u": 1, "v": 2 }
+      {
+        "name": "P3",
+        "description": "Z -> c - Y (nowy węzeł Y tworzy trójkąty z sąsiadami X)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "Z" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [
+            { "index": 0, "label": "c" },
+            { "index": 1, "label": "Y" }
+          ],
+          "edges": [ { "u": 0, "v": 1 } ]
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": [
+          { "leftVertex": 0, "neighborLabel": "X", "connectTo": [1] }
         ]
       },
-      "mapping": [
-        { "left": 0, "right": 0 }
-      ],
-      "embedding": [
-        {
-          "leftVertex": 1,
-          "neighborLabel": "*",
-          "connectTo": [2]
-        }
-      ],
-      "negativeConditions": []
-    }
-  ],
+      {
+        "name": "P4",
+        "description": "X -> a - b (podział węzła: obaj następcy dziedziczą wszystkich sąsiadów)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "X" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [
+            { "index": 0, "label": "a" },
+            { "index": 1, "label": "b" }
+          ],
+          "edges": [ { "u": 0, "v": 1 } ]
+        },
+        "mapping": [],
+        "embedding": [
+          { "leftVertex": 0, "neighborLabel": "*", "connectTo": [0, 1] }
+        ]
+      },
+      {
+        "name": "P5",
+        "description": "X -> a (zakończenie)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "X" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [ { "index": 0, "label": "a" } ],
+          "edges": []
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": []
+      },
+      {
+        "name": "P6",
+        "description": "Y -> b (zakończenie)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "Y" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [ { "index": 0, "label": "b" } ],
+          "edges": []
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": []
+      },
+      {
+        "name": "P7",
+        "description": "Z -> c (zakończenie)",
+        "left": {
+          "vertices": [ { "index": 0, "label": "Z" } ],
+          "edges": []
+        },
+        "right": {
+          "vertices": [ { "index": 0, "label": "c" } ],
+          "edges": []
+        },
+        "mapping": [ { "left": 0, "right": 0 } ],
+        "embedding": []
+      }
+    ]
+  },
+
   "executionPolicy": {
-    "strategy": "priority_first_match",
-    "conflictResolution": "first_found",
-    "maxSteps": 10,
-    "stopConditions": {
-      "noMatchFound": true,
-      "maxVertices": 100
-    }
+    "nodeSelectionStrategy": "min_id",
+    "sequence": ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+    "maxSteps": 20
   }
 }
