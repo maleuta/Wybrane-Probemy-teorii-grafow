@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -23,6 +24,10 @@ class Graph:
         self.directed = directed
         self.vertices: Dict[int, Vertex] = {}
         self.adj: Dict[int, Dict[int, Edge]] = {}
+
+    def copy(self) -> "Graph":
+        """Tworzy niezależną (głęboką) kopię grafu na potrzeby obiektu History."""
+        return copy.deepcopy(self)
 
     def add_vertex(self, index: int, label: str, attributes: Optional[dict] = None) -> Vertex:
         if index in self.vertices:
@@ -61,7 +66,6 @@ class Graph:
         return max(self.vertices.keys(), default=-1) + 1
 
     def is_terminal(self, terminals: Set[str]) -> bool:
-        """Zwraca True, jeśli wszystkie wierzchołki grafu mają etykiety terminalne."""
         return all(v.label in terminals for v in self.vertices.values())
 
     @classmethod
@@ -75,7 +79,7 @@ class Graph:
         return g
 
     def __repr__(self) -> str:
-        nodes_str = ", ".join(f"{v.index}:{v.label}" for k, v in sorted(self.vertices.items()))
+        nodes_str = ", ".join(f"{v.index}:{v.label}" for _, v in sorted(self.vertices.items()))
         edge_count = sum(len(x) for x in self.adj.values())
         if not self.directed:
             edge_count //= 2
